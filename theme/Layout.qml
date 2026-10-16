@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick
+import qs.services
 
 QtObject {
     property int topBarHeight: s(50)
@@ -18,7 +19,7 @@ QtObject {
     property int connectedSpacing: 4
     property int rowMinHeight: 72
 
-    property real uiScale: 1.0
+    property real uiScale: SettingsStore.values.uiScale
 
     function s(n) { return Math.round(n * uiScale) }
     function ts(n) { return Math.max(14, Math.round(n * uiScale)) }

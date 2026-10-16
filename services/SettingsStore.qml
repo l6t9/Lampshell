@@ -27,6 +27,7 @@ Singleton {
         suspendAfterMin: 0,
         dockPosition: "left",
         barPosition: "top",
+        uiScale: 1.0,
         dashboardEnabled: true,
         weatherLocation: "",
         weatherUnits: "metric",

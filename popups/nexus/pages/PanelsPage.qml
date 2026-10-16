@@ -31,6 +31,22 @@ PageBase {
             checked: SettingsStore.values.musicPlayerWidgetEnabled
             onToggled: checked => SettingsStore.set("musicPlayerWidgetEnabled", checked)
         }
+        SliderRow {
+            icon: "fullscreen"
+            label: "Scaling"
+            suffix: "%"
+            value: Math.round(SettingsStore.values.uiScale*100)
+            from: 50
+            to: 200
+            snap: 25
+            resetEnabled: true
+            reset: 100
+            onMoved: value => SettingsStore.set("uiScale", value/100.0)
+        }
+        InfoRow {
+            label: "WARNING : Scaling is experimental and should only be used for development purposes."
+            
+        }
     }
 
     SettingsGroup {
