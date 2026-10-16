@@ -1,4 +1,13 @@
+# editor tools
 .qmllint.ini
+.qmlls.ini
+
+# generated files
 theme/colors.json
 theme/colors.json.bak
 plugin/build/
+build
+
+# vscode
+*.code-workspace
+.vscode
