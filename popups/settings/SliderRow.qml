@@ -11,6 +11,9 @@ Item {
     property real value: 0
     property real from: 0
     property real to: 100
+    property real snap: -1
+    property bool resetEnabled: false
+    property real reset: 0
     signal moved(real value)
 
     property bool dragging: false
@@ -30,7 +33,13 @@ Item {
         isFirst = first;
         isLast = last;
     }
-
+    function snapf(value, snap) {
+        if (snap <= 0) {
+            return value
+        }
+        let new_val = value - root.from
+        return Math.round(new_val/snap)*snap+root.from
+    }
     readonly property real outerRadius: Layout.connectedOuterRadius
     readonly property real innerRadius: Layout.connectedInnerRadius
 
@@ -93,14 +102,14 @@ Item {
             color: Theme.surface_container_highest
 
             Rectangle {
-                width: track.width * ((root.value - root.from) / Math.max(1, root.to - root.from))
+                width: track.width * ((root.snapf(root.value,root.snap) - root.from) / Math.max(1, root.to - root.from))
                 height: parent.height
                 radius: parent.radius
                 color: Theme.primary
             }
-
+            
             Rectangle {
-                x: Math.max(0, Math.min(track.width - width, track.width * ((root.value - root.from) / Math.max(1, root.to - root.from)) - width / 2))
+                x: Math.max(0, Math.min(track.width - width, track.width * ((root.snapf(root.value,root.snap) - root.from) / Math.max(1, root.to - root.from)) - width / 2))
                 y: (track.height - height) / 2
                 width: 20
                 height: 20
@@ -145,7 +154,7 @@ Item {
                 const v = root.from + ratio * (root.to - root.from);
 
                 root.dragging = true;
-                root.moved(v);
+                root.moved(root.snapf(v,root.snap));
             }
         }
 
@@ -183,6 +192,49 @@ Item {
                     weight: Font.Medium
                 }
             }
+        }
+        Rectangle {
+            id: resetButton
+            property bool hovered
+            anchors.verticalCenter: parent.verticalCenter
+            height:Layout.s(32)
+            width:Layout.s(32)
+            radius: width/2
+            visible: root.resetEnabled && root.reset !== root.value
+            color: hovered ? Theme.background : "transparent"
+            Behavior on color {
+                ColorAnimation {
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                }
+            }
+            Text {
+                anchors.centerIn: parent
+                text: "refresh"
+                color: Theme.on_primary_container
+                font {
+                    family: Layout.fontIcons
+                    pixelSize: Layout.s(24)
+                    weight: Font.Medium
+                }
+            }
+
+            MouseArea {
+                id: resetButtonArea
+                anchors.fill: parent
+                //anchors.margins: -10
+                enabled: root.enabled
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+
+                onPressed: function(event) {
+                    root.moved(reset)
+                }
+                onEntered: {resetButton.hovered = true}
+                onExited: {resetButton.hovered = false}
+                
+            }
+
         }
     }
 }

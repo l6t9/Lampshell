@@ -36,7 +36,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: 16
         anchors.verticalCenter: parent.verticalCenter
-        width: Math.max(0, parent.width * 0.4 - 16)
+        width: value === "" ? parent.width - 16 : (Math.max(0, parent.width * 0.4 - 16))
         text: root.label
         elide: Text.ElideRight
         color: Theme.on_surface
@@ -47,6 +47,7 @@ Item {
     }
 
     Text {
+        visible: value !== ""
         anchors.left: parent.left
         anchors.leftMargin: parent.width * 0.4
         anchors.right: parent.right
