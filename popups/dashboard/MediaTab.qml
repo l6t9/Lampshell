@@ -1,6 +1,8 @@
 import QtQuick
 import qs.theme
 import qs.services
+import qs.utilities
+
 
 Item {
     id: root
@@ -101,14 +103,15 @@ Item {
                 }
             }
 
-            Text {
+            ScrollingText {
                 width: parent.width
-                text: root.player ? (root.player.trackTitle || "Unknown title") : ""
-                color: Theme.on_surface
-                elide: Text.ElideRight
-                maximumLineCount: 2
-                wrapMode: Text.WordWrap
-                font {
+                running:true
+                innerText.maximumLineCount : GameMode.enabled ? 2 : 1
+                innerText.wrapMode : GameMode.enabled ? Text.Wrap : Text.NoWrap
+                innerText.elide : Text.NoElide
+                innerText.text: root.player ? (root.player.trackTitle || "Unknown title") : ""
+                innerText.color: Theme.on_surface
+                innerText.font {
                     family: Layout.fontSans
                     pixelSize: Layout.s(30)
                     weight: Font.DemiBold

@@ -3,6 +3,7 @@ import Quickshell.Services.Mpris
 import qs.popups.dashboard
 import qs.services
 import qs.theme
+import qs.utilities
 
 Item {
     id: root
@@ -16,8 +17,8 @@ Item {
         id: visualPill
 
         anchors.centerIn: parent
-        implicitWidth: coverImage.width + timeLabel.implicitWidth + (Players.active ? playerButtons.implicitWidth : Layout.s(10)) + Layout.s(10)
-        implicitHeight: timeLabel.implicitHeight + Layout.s(16)
+        implicitWidth: coverImage.width + timeLabel.width + (Players.active ? playerButtons.implicitWidth : Layout.s(10)) + Layout.s(10)
+        implicitHeight: timeLabel.height + Layout.s(16)
         radius: height / 2
         color: {
             if (pillMouse.containsMouse)
@@ -56,33 +57,35 @@ Item {
 
         }
 
-        Text {
+        ScrollingText {
             id: timeLabel
-
-            text: {
+            running: Players.active?.isPlaying ?? false
+            width: Layout.s(200)
+            height:Layout.s(24)
+            innerText.text: {
                 if (!Players.active)
                     return "No player was found.";
 
                 if (Players.activeTitle === "")
                     return "Nothing is playing.";
 
-                return Players.activeTitle.length < 30 ? Players.activeTitle : Players.activeTitle.substring(0, 27) + "...";
+                return Players.activeTitle;
             }
-            color: Theme.on_surface
+            innerText.color: Theme.on_surface
 
             anchors {
                 left: coverImage.right
                 leftMargin: Layout.s(5)
                 verticalCenter: parent.verticalCenter
+                
             }
-
-            font {
+            innerText.font {
                 family: "Google Sans"
                 pointSize: 14
                 weight: Font.Medium
             }
 
-            Behavior on color {
+            Behavior on innerText.color {
                 ColorAnimation {
                     duration: 150
                     easing.type: Easing.OutCubic
