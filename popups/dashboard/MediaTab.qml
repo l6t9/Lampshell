@@ -1,6 +1,8 @@
 import QtQuick
 import qs.theme
 import qs.services
+import qs.utilities
+
 
 Item {
     id: root
@@ -101,32 +103,31 @@ Item {
                 }
             }
 
-            Text {
+            ScrollingText {
                 width: parent.width
-                text: root.player ? (root.player.trackTitle || "Unknown title") : ""
-                color: Theme.on_surface
-                elide: Text.ElideRight
-                maximumLineCount: 2
-                wrapMode: Text.WordWrap
-                font {
+                paused:false
+                innerText.maximumLineCount : GameMode.enabled ? 2 : 1
+                innerText.wrapMode : GameMode.enabled ? Text.Wrap : Text.NoWrap
+                innerText.text: root.player ? (root.player.trackTitle || "Unknown title") : ""
+                innerText.color: Theme.on_surface
+                innerText.font {
                     family: Layout.fontSans
                     pixelSize: Layout.s(30)
                     weight: Font.DemiBold
                 }
             }
 
-            Text {
+            ScrollingText {
                 width: parent.width
-                text: {
+                innerText.text: {
                     if (!root.player)
                         return "";
                     const artist = root.player.trackArtist || "";
                     const album = root.player.trackAlbum || "";
                     return album.length > 0 ? artist + " — " + album : artist;
                 }
-                color: Theme.on_surface_variant
-                elide: Text.ElideRight
-                font {
+                innerText.color: Theme.on_surface_variant
+                innerText.font {
                     family: Layout.fontSans
                     pixelSize: Layout.s(16)
                 }
@@ -199,15 +200,13 @@ Item {
                     ]
 
                     delegate: Rectangle {
-                        id: model
                         required property var modelData
-                        property bool hovered
                         anchors.verticalCenter: parent.verticalCenter
                         width: modelData.size + Layout.s(16)
                         height: width
                         radius: width / 2
-                        scale: model.hovered ? 1.1 : 1.0
-                        color: modelData.action === "toggle" ? (model.hovered ? Theme.secondary : Theme.primary) : "transparent"
+                        scale: modelArea.containsPress ? 0.9 : 1.0
+                        color: modelData.action === "toggle" ? (modelArea.containsMouse ? Theme.secondary : Theme.primary) : "transparent"
                         Behavior on scale {
                             NumberAnimation {
                                 duration: 150
@@ -224,7 +223,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: modelData.icon
-                            color: modelData.action === "toggle" ? (model.hovered ? Theme.on_secondary : Theme.on_primary) : Theme.on_surface
+                            color: modelData.action === "toggle" ? (modelArea.containsMouse ? Theme.on_secondary : Theme.on_primary) : Theme.on_surface
                             id:modelText
                             renderType: Text.NativeRendering
                             font {
@@ -243,14 +242,9 @@ Item {
 
                         MouseArea {
                             anchors.fill: parent
+                            id: modelArea
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onEntered: {
-                                model.hovered = true
-                            }
-                            onExited: {
-                                model.hovered = false
-                            }
                             onClicked: {
                                 if (!root.player)
                                     return;

@@ -53,6 +53,7 @@ Variants {
                 BarContent {
                     windowHandle: bottomBarWindow
                     statusPillHandler: root.statusPillHandler
+                    showMpris: true
                 }
             }
         }

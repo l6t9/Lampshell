@@ -1,8 +1,8 @@
 import QtQuick
-import Quickshell.Services.Mpris
 import qs.popups.dashboard
 import qs.services
 import qs.theme
+import qs.utilities
 
 Item {
     id: root
@@ -16,8 +16,8 @@ Item {
         id: visualPill
 
         anchors.centerIn: parent
-        implicitWidth: coverImage.width + timeLabel.implicitWidth + (Players.active ? playerButtons.implicitWidth : Layout.s(10)) + Layout.s(10)
-        implicitHeight: timeLabel.implicitHeight + Layout.s(16)
+        implicitWidth: coverImage.width + songLabel.width + (Players.active ? playerButtons.implicitWidth : Layout.s(10)) + Layout.s(10)
+        implicitHeight: songLabel.height + Layout.s(16)
         radius: height / 2
         color: {
             if (pillMouse.containsMouse)
@@ -56,33 +56,34 @@ Item {
 
         }
 
-        Text {
-            id: timeLabel
-
-            text: {
+        ScrollingText {
+            id: songLabel
+            width: Layout.s(200)
+            height:Layout.s(24)
+            innerText.text: {
                 if (!Players.active)
-                    return "No player was found.";
+                    return "No player found";
 
                 if (Players.activeTitle === "")
-                    return "Nothing is playing.";
+                    return "Nothing is playing";
 
-                return Players.activeTitle.length < 30 ? Players.activeTitle : Players.activeTitle.substring(0, 27) + "...";
+                return Players.activeTitle;
             }
-            color: Theme.on_surface
+            innerText.color: Theme.on_surface
 
             anchors {
                 left: coverImage.right
                 leftMargin: Layout.s(5)
                 verticalCenter: parent.verticalCenter
+                
             }
-
-            font {
+            innerText.font {
                 family: "Google Sans"
                 pointSize: 14
                 weight: Font.Medium
             }
 
-            Behavior on color {
+            Behavior on innerText.color {
                 ColorAnimation {
                     duration: 150
                     easing.type: Easing.OutCubic
@@ -101,7 +102,7 @@ Item {
             anchors {
                 verticalCenter: parent.verticalCenter
                 topMargin: Layout.s(8)
-                left: timeLabel.right
+                left: songLabel.right
                 right: parent.right
                 leftMargin: Layout.s(5)
             }
@@ -123,13 +124,11 @@ Item {
 
                 delegate: Rectangle {
                     required property var modelData
-                    property bool hovered
-                    id:model
                     width: modelData.size + Layout.s(16)
                     height: width
                     radius: width / 2
-                    scale: model.hovered ? 1.1 : 1.0
-                    color: modelData.action === "toggle" ? (model.hovered ? Theme.secondary : Theme.primary) : "transparent"
+                    scale: playerButtonArea.containsPress ? 0.9 : 1.0
+                    color: modelData.action === "toggle" ? (playerButtonArea.containsMouse ? Theme.secondary : Theme.primary) : "transparent"
                     anchors.verticalCenter: parent.verticalCenter
                     Behavior on scale {
                         NumberAnimation {
@@ -147,7 +146,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: modelData.icon
-                        color: modelData.action === "toggle" ? (model.hovered ? Theme.on_secondary : Theme.on_primary) : Theme.on_surface
+                        color: modelData.action === "toggle" ? (playerButtonArea.containsMouse ? Theme.on_secondary : Theme.on_primary) : Theme.on_surface
                         id:modelText
                         font {
                             family: Layout.fontIcons
@@ -167,12 +166,7 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onEntered: {
-                            model.hovered = true
-                        }
-                        onExited: {
-                            model.hovered = false
-                        }
+                        id:playerButtonArea
                         onClicked: {
                             if (!Players.active)
                                 return ;

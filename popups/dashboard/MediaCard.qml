@@ -1,6 +1,7 @@
 import QtQuick
 import qs.theme
 import qs.services
+import qs.utilities
 
 Item {
     id: root
@@ -67,38 +68,35 @@ Item {
         anchors.right: parent.right
         spacing: Layout.s(3)
 
-        Text {
+        ScrollingText {
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-            text: root.player ? (root.player.trackTitle || "Unknown title") : "No media"
-            color: root.accent
-            font {
+            innerText.horizontalAlignment: Text.AlignHCenter
+            innerText.text: root.player ? (root.player.trackTitle || "Unknown title") : "No media"
+            innerText.color: root.accent
+            innerText.font {
                 family: Layout.fontSans
                 pixelSize: Layout.s(15)
                 weight: Font.Medium
             }
         }
 
-        Text {
+        ScrollingText {
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-            text: root.player ? (root.player.trackAlbum || "Unknown album") : ""
-            color: Theme.outline
-            font {
+            innerText.horizontalAlignment: Text.AlignHCenter
+            innerText.text: root.player ? (root.player.trackAlbum || "Unknown album") : ""
+            innerText.color: Theme.outline
+            innerText.font {
                 family: Layout.fontSans
                 pixelSize: Layout.s(12)
             }
         }
 
-        Text {
+        ScrollingText {
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-            text: root.player ? (root.player.trackArtist || "Unknown artist") : ""
-            color: Theme.secondary
-            font {
+            innerText.horizontalAlignment: Text.AlignHCenter
+            innerText.text: root.player ? (root.player.trackArtist || "Unknown artist") : ""
+            innerText.color: Theme.secondary
+            innerText.font {
                 family: Layout.fontSans
                 pixelSize: Layout.s(12)
             }
@@ -121,15 +119,13 @@ Item {
             ]
 
             delegate: Rectangle {
-                id:model
                 required property var modelData
-                property bool hovered
                 anchors.verticalCenter: parent.verticalCenter
                 width: Layout.s(46)
                 height: width
                 radius: width / 2
-                scale: model.hovered ? 1.1 : 1.0
-                color: modelData.action === "toggle" ? (model.hovered ? Theme.secondary : Theme.primary) : "transparent"
+                scale: modelArea.containsPress ? 0.9 : 1.0
+                color: modelData.action === "toggle" ? (modelArea.containsMouse ? Theme.secondary : Theme.primary) : "transparent"
                 opacity: modelData.enabled ? 1 : 0.4
                 Behavior on scale {
                     NumberAnimation {
@@ -147,7 +143,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: modelData.icon
-                    color: modelData.action === "toggle" ? (model.hovered ? Theme.on_secondary : Theme.on_primary) : Theme.on_surface
+                    color: modelData.action === "toggle" ? (modelArea.containsMouse ? Theme.on_secondary : Theme.on_primary) : Theme.on_surface
                     id:modelText
                     renderType: Text.NativeRendering
                     font {
@@ -167,15 +163,10 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
+                    id:modelArea
                     enabled: modelData.enabled
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onEntered: {
-                        model.hovered = true
-                    }
-                    onExited: {
-                        model.hovered = false
-                    }
                     onClicked: {
                         if (!root.player)
                             return;
